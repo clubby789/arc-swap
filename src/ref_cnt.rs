@@ -91,6 +91,8 @@ unsafe impl<T> RefCnt for Arc<T> {
     fn into_ptr(me: Arc<T>) -> *mut T {
         Arc::into_raw(me) as *mut T
     }
+    // `as_ptr` is not an inherent method on `Arc` until 1.45
+    #[deny(unconditional_recursion)]
     fn as_ptr(me: &Arc<T>) -> *mut T {
         Arc::as_ptr(me) as *mut T
     }
@@ -104,11 +106,10 @@ unsafe impl<T> RefCnt for Rc<T> {
     fn into_ptr(me: Rc<T>) -> *mut T {
         Rc::into_raw(me) as *mut T
     }
+    // `as_ptr` is not an inherent method on `Rc` until 1.45
+    #[deny(unconditional_recursion)]
     fn as_ptr(me: &Rc<T>) -> *mut T {
-        me as &T as *const T as *mut T
-    }
-    unsafe fn from_ptr(ptr: *const T) -> Rc<T> {
-        Rc::from_raw(ptr)
+        Rc::as_ptr(me) as *mut T
     }
 }
 
